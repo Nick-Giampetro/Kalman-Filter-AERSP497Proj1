@@ -41,7 +41,7 @@ xp2(:,n2+1) = x2_k1;
 n2=n2+1;
 end
 t=0:0.1:10-0.1;
-h1 = plot(t, xp(1,:), 'r', t, xp(2,:),'g',t, xp(3,:), 'b', t, xp2(1,:), 'c', t, xp2(2,:),'m', t, xp2(3,:),'y');
+h1 = plot(t, xp(1,:), 'r', t, xp(2,:),'g',t, xp(3,:), 'b', t, xp2(1,:), 'c', t, xp2(2,:),'m', t, xp2(3,:),'k');
 %h1 = plot(t, xp(1,:), '-', t, xp(2,:),'-.');
 xlabel('Time(sec)');
 ylabel('masses position');
@@ -52,7 +52,7 @@ t0 = 0: 0.1: 10;
 zz = my_rk4(@spring_sys,t0,x0);
 zz2 = my_rk4(@spring_sys2,t0,x0);
 figure
-h2 = plot(t0,zz(1,:),'r',t0,zz(2,:),'g',t0,zz(3,:),'b',t0,zz2(1,:),'c',t0,zz2(2,:),'m',t0,zz2(3,:),'y' );
+h2 = plot(t0,zz(1,:),'r',t0,zz(2,:),'g',t0,zz(3,:),'b',t0,zz2(1,:),'c',t0,zz2(2,:),'m',t0,zz2(3,:),'k' );
 
 xlabel('Time(sec)');
 ylabel('masses position');
