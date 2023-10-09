@@ -52,7 +52,7 @@ t0 = 0: 0.1: 10;
 zz = my_rk4(@spring_sys,t0,x0);
 zz2 = my_rk4(@spring_sys2,t0,x0);
 figure
-h2 = plot(t0,zz(1,:),'r',t0,zz(2,:),'g',t0,zz(2,:),'b',t0,zz2(1,:),'c',t0,zz2(2,:),'m',t0,zz2(2,:),'y' );
+h2 = plot(t0,zz(1,:),'r',t0,zz(2,:),'g',t0,zz(3,:),'b',t0,zz2(1,:),'c',t0,zz2(2,:),'m',t0,zz2(3,:),'y' );
 
 xlabel('Time(sec)');
 ylabel('masses position');
