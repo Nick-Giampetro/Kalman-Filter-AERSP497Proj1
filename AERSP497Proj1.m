@@ -14,12 +14,6 @@ B_d = (expm(A_c * dT) - eye(6))*inv(A_c)*B_c;
 sigma_u = [0.2 0;0 0.2];
 sigma_v = [0.1 0;0 0.1];
 
-<<<<<<< HEAD
-
-=======
-P0 = blkdiag(eye(3), 0.1*eye(3));
-%-------------------discrete time system simulation------------------------
->>>>>>> 4527af9d3ddb1189d43791d63c7e29481c0de2c4
 x0 =[1 2 3 0 0 0]';
 x_k = x0;
 x_k1 = x_k;
@@ -52,11 +46,18 @@ for n = 0:99
     xp2(:,n+1) = x2_k1;
 end
 
-P0 = blkdiag(eye(3), 0.1*eye(3)) ;
+S_u=0.2 ;
+Q_model=B_d*S_u*B_d' ;
 
-for n = 1:100
-    x_hat(:,n)=A_model*x_hat(:,n-1); % the model assumes ubar=0
-    P_hat(:,:,n)=A_model*P_hat(:,:,n-1)*A_model' + Q_model + Q_extra;
+x_hat = zeros(6,100);
+P0 = blkdiag(eye(3), 0.1*eye(3)) ;
+P_hat(:,:,1) = P0 ;
+xhat0 = [0 0 0 0 0 0]' ;
+x_hat(:,1)=xhat0 ;
+
+for n = 2:100
+    x_hat(:,n)=A_d*x_hat(:,n-1); % the model assumes ubar=0
+    P_hat(:,:,n)=A_d*P_hat(:,:,n-1)*A_d' + Q_model + Q_extra;
     
     % measurement update
     Sr(:,:,n)=C*P_hat(:,:,n)*C' + R; % innovations covariance
