@@ -12,6 +12,8 @@ B_d = (expm(A_c * dT) - eye(6))*inv(A_c)*B_c;
 
 sigma_u = [0.2 0;0 0.2];
 sigma_v = [0.1 0;0 0.1];
+
+P0 = blkdiag(eye(3), 0.1*eye(3));
 %-------------------discrete time system simulation------------------------
 x0 =[1 2 3 0 0 0]';
 x_k = x0;
