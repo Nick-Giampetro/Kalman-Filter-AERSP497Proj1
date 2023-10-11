@@ -47,20 +47,25 @@ for n = 0:99
     xp2(:,n+1) = x2_k1;
 end
 
+
+
+x_hat = zeros(6,100);
+
 S_u=0.2 ;
 S_v=0.1 ;
 Q_model=B_d*S_u*B_d' ;
 
-x_hat = zeros(6,100);
 P0 = blkdiag(eye(3), 0.1*eye(3)) ;
 P_hat(:,:,1) = P0 ;
-xhat0 = [1 2 3 0 0 0]' ;
+xhat0 = [0 0 0 0 0 0]' ;
 x_hat(:,1)=xhat0 ;
 
 C = [1 1 1 0 0 0] ;
 
 for n = 2:100
-    y1(:,n-1) = C_c*x_hat(:,n) + sqrtm(S_v)*randn(1,1);
+    u_true(k-1)=u_bar + sqrtm(S_u)*randn(1,1); % gaussian random noise with mean u_bar
+    x_tru(:,k)=A_d*x_tru(:,k-1) + B_true*u_true(k-1); % true state change
+    y1(:,n-1) = C_c*x_tru(:,n) + sqrtm(S_v)*randn(1,1);
 
     x_hat(:,n) = A_d*x_hat(:,n-1); % the model assumes ubar=0
     P_hat(:,:,n) = A_d*P_hat(:,:,n-1)*A_d' + Q_model;
