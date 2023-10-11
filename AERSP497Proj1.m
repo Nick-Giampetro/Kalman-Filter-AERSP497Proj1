@@ -47,6 +47,7 @@ for n = 0:99
 end
 
 S_u=0.2 ;
+S_v=0.1 ;
 Q_model=B_d*S_u*B_d' ;
 
 x_hat = zeros(6,100);
@@ -55,34 +56,44 @@ P_hat(:,:,1) = P0 ;
 xhat0 = [0 0 0 0 0 0]' ;
 x_hat(:,1)=xhat0 ;
 
+C = [1 1 1 0 0 0] ;
+
 for n = 2:100
-    x_hat(:,n)=A_d*x_hat(:,n-1); % the model assumes ubar=0
-    P_hat(:,:,n)=A_d*P_hat(:,:,n-1)*A_d' + Q_model + Q_extra;
+    y1(:,n-1) = C_c*x_hat(:,n) + sqrtm(S_v)*randn(1,1);
+
+    x_hat(:,n) = A_d*x_hat(:,n-1); % the model assumes ubar=0
+    P_hat(:,:,n) = A_d*P_hat(:,:,n-1)*A_d' + Q_model;
     
     % measurement update
-    Sr(:,:,n)=C*P_hat(:,:,n)*C' + R; % innovations covariance
+    Sr(:,:,n)=C*P_hat(:,:,n)*C' + S_v; % innovations covariance
     K(:,n)=P_hat(:,:,n)*C'*inv(Sr(:,:,n));
-    ry(:,n)=y(n)-C*x_hat(:,n); % innovations
+    ry(:,n)=y1(n)-C*x_hat(:,n); % innovations
     x_hat(:,n)=x_hat(:,n) + K(:,n)*ry(:,n);
-    P_hat(:,:,n)=(eye(2) - K(:,n)*C)*P_hat(:,:,n);
+    P_hat(:,:,n)=(eye(6) - K(:,n)*C)*P_hat(:,:,n);
     eta(n)=ry(:,n)'*inv(Sr(:,:,n))*ry(:,n);
     
     Sx(:,n)=sqrt(diag(P_hat(:,:,n)));
 end
-e=x_tru-x_hat; % compute estimate error
+e=xp-x_hat; % compute estimate error
 sig=sqrt([squeeze(P_hat(1,1,:))';squeeze(P_hat(2,2,:))']);
 
 t=0:dT:10-0.1;
 
 
 figure
-h0 = plot(t, y(1,:),'r',t, y(2,:),'g',t, y(3,:),'b');
+h0 = plot(t, x_hat(1,:),'r',t, x_hat(2,:),'g',t, x_hat(3,:),'b');
 xlabel('Time(sec)');
 ylabel('masses position according to sensor');
 legend('mass 1 u~(0,0.1I)','mass 2 u~(0,0.1I)','mass 3 u~(0,0.1I)');
 
 figure
-h1 = plot(t, xp(1,:), '--', t, xp(2,:),'--',t, xp(3,:), '--', t, xp2(1,:), 'r', t, xp2(2,:),'g', t, xp2(3,:),'b');
+h1 = plot(t, y(1,:),'r',t, y(2,:),'g',t, y(3,:),'b');
+xlabel('Time(sec)');
+ylabel('masses position according to sensor');
+legend('mass 1 u~(0,0.1I)','mass 2 u~(0,0.1I)','mass 3 u~(0,0.1I)');
+
+figure
+h2 = plot(t, xp(1,:), '--', t, xp(2,:),'--',t, xp(3,:), '--', t, xp2(1,:), 'r', t, xp2(2,:),'g', t, xp2(3,:),'b');
 xlabel('Time(sec)');
 ylabel('masses position aacording to dynamics');
 legend('mass 1 (ideal)','mass 2 (ideal)','mass 3 (ideal)','mass 1 u~(0,0.2I)','mass 2 u~(0,0.2I)','mass 3 u~(0,0.2I)');
