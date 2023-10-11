@@ -17,7 +17,6 @@ x0 =[1 2 3 0 0 0]';
 x_k = x0;
 x_k1 = x_k;
 u=[0 0 0]';
-n=0;
 xp = zeros(6,100);
 xp(:,1) = x_k;
 
@@ -29,20 +28,21 @@ end
 
 x2_k = x0;
 x2_k1 = x2_k;
-n2=0;
 xp2 = zeros(6,100);
 xp2(:,1) = x2_k;
 
-for n2 = 0:99
+y = zeros(3,100);
+
+for n = 0:99
 urandv = normrnd(0,0.1*eye(3));
 ukv=[urandv(1,1);urandv(2,2);urandv(3,3)];
-y(:,n2+1) = C_c * x2_k + ukv ;
+y(:,n+1) = C_c * x2_k + ukv ;
 
 x2_k = x2_k1;
 urandu = normrnd(0,0.2*eye(3));
 uku=[urandu(1,1);urandu(2,2);urandu(3,3)];
 x2_k1 = A_d*x2_k + B_d*uku;
-xp2(:,n2+1) = x2_k1;
+xp2(:,n+1) = x2_k1;
 end
 
 t=0:dT:10-0.1;
