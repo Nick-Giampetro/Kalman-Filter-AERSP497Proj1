@@ -98,6 +98,7 @@ subplot(2,2,3)
     ylim([-2 2])
     ylabel('innovations')
     text(10,1,'k=knom, b=bnom')
+
 subplot(2,2,4)
     plot(1:MAXK,eta)
     xlim([0 200])
