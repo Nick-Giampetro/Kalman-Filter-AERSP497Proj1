@@ -1,6 +1,7 @@
 
 clc;
 clear;
+close all;
 
 
 A_c = [0 0 0 1 0 0; 0 0 0 0 1 0; 0 0 0 0 0 1; -2 1 0 -1.6 0.8 0; 1 -2 1 0.8 -1.6 0.8; 0 1 -1 0 0.8 -0.8];
@@ -53,7 +54,7 @@ Q_model=B_d*S_u*B_d' ;
 x_hat = zeros(6,100);
 P0 = blkdiag(eye(3), 0.1*eye(3)) ;
 P_hat(:,:,1) = P0 ;
-xhat0 = [0 0 0 0 0 0]' ;
+xhat0 = [1 2 3 0 0 0]' ;
 x_hat(:,1)=xhat0 ;
 
 C = [1 1 1 0 0 0] ;
@@ -74,17 +75,25 @@ for n = 2:100
     
     Sx(:,n)=sqrt(diag(P_hat(:,:,n)));
 end
+
+y1(:,100) = C_c*x_hat(:,100) + sqrtm(S_v)*randn(1,1) ;
+
 e=xp-x_hat; % compute estimate error
 sig=sqrt([squeeze(P_hat(1,1,:))';squeeze(P_hat(2,2,:))']);
 
 t=0:dT:10-0.1;
 
-
 figure
-h0 = plot(t, x_hat(1,:),'r',t, x_hat(2,:),'g',t, x_hat(3,:),'b');
+h1 = plot(t, y1(1,:),'r',t, y1(2,:),'g',t, y1(3,:),'b');
 xlabel('Time(sec)');
 ylabel('masses position according to sensor');
 legend('mass 1 u~(0,0.1I)','mass 2 u~(0,0.1I)','mass 3 u~(0,0.1I)');
+
+figure
+h0 = plot(t, xp(1,:), '--', t, xp(2,:),'--',t, xp(3,:), '--', t, x_hat(1,:),'r',t, x_hat(2,:),'g',t, x_hat(3,:),'b');
+xlabel('Time(sec)');
+ylabel('masses position according to sensor');
+legend('mass 1 (ideal)','mass 2 (ideal)','mass 3 (ideal)','mass 1 u~(0,0.2I)','mass 2 u~(0,0.2I)','mass 3 u~(0,0.2I)');
 
 figure
 h1 = plot(t, y(1,:),'r',t, y(2,:),'g',t, y(3,:),'b');
