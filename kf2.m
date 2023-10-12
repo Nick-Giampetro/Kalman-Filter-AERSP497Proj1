@@ -82,6 +82,12 @@ Sr=squeeze(Sr); % remove singleton dimensions
 % plot results
 
 figure
+h0 = plot(time, x_tru(1,:), '--', time, x_hat(1,:));
+xlabel('Time(sec)');
+ylabel('masses position according to dynamics');
+legend('mass 1 u~(0,0.2I)','mass 1 (KF)');
+
+figure
 subplot(2,2,1)
     plot(time,e(1,:),'b',time,Sx(1,:),'b:',time,-Sx(1,:),'b:')
     xlim([t0 tf])
