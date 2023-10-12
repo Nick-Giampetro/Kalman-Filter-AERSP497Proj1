@@ -52,7 +52,8 @@ u_bar=0 ;
 
 S_u = 0.2 * eye(3) ;
 S_v = 0.1 * eye(3) ;
-Q_d=B_d*S_u*B_d' ;
+Q = B_d*S_u*B_d' ;
+R = eye(3)*S_v*eye(3)' ;
 
 P0 = blkdiag(eye(3), 0.1*eye(3)) ;
 P_hat(:,:,1) = P0 ;
@@ -69,16 +70,17 @@ for k = 2:100
     urandv = normrnd(u_bar,S_v*eye(3)) ;
     u_sensor(:,k-1)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
     y1(:,k-1) = C_c*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
-    
-    R = eye(3)*S_v*eye(3)' ;
 
     x_hat(:,k) = A_d*x_hat(:,k-1); % the model assumes ubar=0
-    P_hat(:,:,k) = A_d*P_hat(:,:,k-1)*A_d' + Q_d;
+    P_hat(:,:,k) = A_d*P_hat(:,:,k-1)*A_d' + Q;
     
     % measurement update
-    K(:,:,k)=P_hat(:,:,k)*C_c'*inv(C_c*P_hat(:,:,k)*C_c' + R);
-    x_hat(:,k)=x_hat(:,k) + K(:,:,k)*(y1(k) - C_c*x_hat(:,k));
+    Sr(:,:,k)=C_c*P_hat(:,:,k)*C_c' + R; % innovations covariance
+    K(:,:,k)=P_hat(:,:,k)*C_c'*inv(Sr(:,:,k));
+    ry(:,k)=y(k)-C_c*x_hat(:,k); % innovations
+    x_hat(:,k)=x_hat(:,k) + K(:,:,k)*ry(:,k);
     P_hat(:,:,k)=(eye(6) - K(:,:,k)*C_c)*P_hat(:,:,k);
+    eta(k)=ry(:,k)'*inv(Sr(:,:,k))*ry(:,k);
     
     % now compute estimate error
     e(:,k)=x_tru(:,k)-x_hat(:,k);
