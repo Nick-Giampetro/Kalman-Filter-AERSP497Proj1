@@ -47,7 +47,7 @@ for k = 2:100
     x_hat(:,k) = A_d*x_hat(:,k-1); % the model assumes ubar=0
     P_hat(:,:,k) = A_d*P_hat(:,:,k-1)*A_d' + Q;
     
-    %C = [1 0 0 1 0 0 ; 0 1 0 0 1 0 ; 0 0 1 0 0 1];
+    %C = [0 1 1 1 1 1 ; 1 0 1 1 1 1 ; 1 1 0 1 1 1];
 
     % measurement update
     P_hat(:,:,k) = inv(inv(P_hat(:,:,k)) + C'*inv(R)*C) ;
