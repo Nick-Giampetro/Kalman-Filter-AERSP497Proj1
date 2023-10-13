@@ -73,8 +73,9 @@ end
 
 t=0:dT:10-dT;
 
-figure
-h0 = plot(t,mean(e_norm(:,:)),t,mean(P_trace(:,:)));
+h0 = figure ;
+plot(t,mean(e_norm(:,:)),t,mean(P_trace(:,:)));
 xlabel('Time(sec)');
 ylabel('Average of errors at each step in time');
 legend('Avg error','P Trace');
+exportgraphics(h0,['Monte Carlo Avereaged Results''.jpg'])
