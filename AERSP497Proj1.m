@@ -42,33 +42,34 @@ xhat0 = x0 ;
 x_hat(:,1)= xhat0 ;
 x_tru(:,1)= x0 ;
 
-
-for k = 2:100
-    urandu = normrnd(u_bar,S_u*eye(3)) ;
-    u_true(:,k-1)=[urandu(1,1);urandu(2,2);urandu(3,3)]; % gaussian random noise with mean S_u
-    x_tru(:,k)=A_d*x_tru(:,k-1) + B_d*u_true(:,k-1); % true state change
-  
-    urandv = normrnd(u_bar,S_v*eye(3)) ;
-    u_sensor(:,k-1)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
-    y(:,k-1) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
-
-    x_hat(:,k) = A_d*x_hat(:,k-1) ;         % the model assumes ubar=0
-    P(:,:,k) = A_d*P(:,:,k-1)*A_d' + Q;
-
-    % measurement update
-    K(:,:,k)=P(:,:,k)*C'*inv(C*P(:,:,k)*C' + R);
-    x_hat(:,k)=x_hat(:,k) + K(:,:,k)*(y(:,k-1) - C*x_hat(:,k));
-    P(:,:,k)=(eye(6) - K(:,:,k)*C)*P(:,:,k);
+for rn = 1:50
+    for k = 2:100
+        urandu = normrnd(u_bar,S_u*eye(3)) ;
+        u_true(:,k-1)=[urandu(1,1);urandu(2,2);urandu(3,3)]; % gaussian random noise with mean S_u
+        x_tru(:,k)=A_d*x_tru(:,k-1) + B_d*u_true(:,k-1); % true state change
+      
+        urandv = normrnd(u_bar,S_v*eye(3)) ;
+        u_sensor(:,k-1)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
+        y(:,k-1) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
     
-    % now compute estimate error
-    e(:,k)=x_tru(:,k)-x_hat(:,k);
-    trP(k)=trace(P(:,:,k));
-    Sx(:,k)=sqrt(diag(P(:,:,k)));
+        x_hat(:,k) = A_d*x_hat(:,k-1) ;         % the model assumes ubar=0
+        P(:,:,k) = A_d*P(:,:,k-1)*A_d' + Q;
+    
+        % measurement update
+        K(:,:,k)=P(:,:,k)*C'*inv(C*P(:,:,k)*C' + R);
+        x_hat(:,k)=x_hat(:,k) + K(:,:,k)*(y(:,k-1) - C*x_hat(:,k));
+        P(:,:,k)=(eye(6) - K(:,:,k)*C)*P(:,:,k);
+        
+        % now compute estimate error
+        e(:,k)=x_tru(:,k)-x_hat(:,k);
+        P_trace(rn,k)=sqrt(trace(P(:,:,k)));
+        e_norm(rn,k) = norm(e(:,k));
+    end
+    
+    urandv = normrnd(u_bar,S_v*eye(3)) ;
+    u_sensor(:,100)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
+    y(:,100) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
 end
-
-urandv = normrnd(u_bar,S_v*eye(3)) ;
-u_sensor(:,100)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
-y(:,100) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
 
 t=0:dT:10-dT;
 
