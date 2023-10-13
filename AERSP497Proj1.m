@@ -74,7 +74,7 @@ end
 t=0:dT:10-dT;
 
 h0 = figure ;
-plot(t,mean(e_norm(:,:)),'b',t,mean(P_trace(:,:)),'--');
+plot(t,mean(e_norm(:,:)),'b',t,mean(P_trace(:,:)),'--r',t,-mean(P_trace(:,:)),'--r');
 xlabel('Time(sec)');
 ylabel('Average of errors at each step in time');
 legend('Avg error','P Trace');
