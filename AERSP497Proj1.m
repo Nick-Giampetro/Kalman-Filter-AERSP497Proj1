@@ -16,9 +16,7 @@ B_c = [0 0 0 ;
        1 0 0 ;  
        0 1 0 ; 
        0 0 1] ;
-%C = [1 1 1 0 0 0] ;
-%C = [1 0 0 0 0 0 ;0 1 0 0 0 0 ; 0 0 1 0 0 0];
-%C = [0 1 0 0 0 0 ;0 0 0 1 0 0 ; 0 0 0 0 0 1];
+C = [1 0 0 0 0 0 ;0 1 0 0 0 0 ; 0 0 1 0 0 0];
 
 dT = 0.1;
 A_d=expm(A_c*dT);
@@ -49,14 +47,12 @@ for k = 2:100
     urandu = normrnd(u_bar,S_u*eye(3)) ;
     u_true(:,k-1)=[urandu(1,1);urandu(2,2);urandu(3,3)]; % gaussian random noise with mean S_u
     x_tru(:,k)=A_d*x_tru(:,k-1) + B_d*u_true(:,k-1); % true state change
-    
-    C = [1 0 0 0 0 0 ;0 1 0 0 0 0 ; 0 0 1 0 0 0];
   
     urandv = normrnd(u_bar,S_v*eye(3)) ;
     u_sensor(:,k-1)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
     y(:,k-1) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
 
-    x_hat(:,k) = A_d*x_hat(:,k-1) ; % the model assumes ubar=0
+    x_hat(:,k) = A_d*x_hat(:,k-1) ;         % the model assumes ubar=0
     P(:,:,k) = A_d*P(:,:,k-1)*A_d' + Q;
 
     % measurement update
@@ -73,8 +69,6 @@ end
 urandv = normrnd(u_bar,S_v*eye(3)) ;
 u_sensor(:,100)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
 y(:,100) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
-
-sig=sqrt([squeeze(P(1,1,:))';squeeze(P(2,2,:))']);
 
 t=0:dT:10-dT;
 
