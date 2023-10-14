@@ -36,6 +36,7 @@ Q = B_d*S_u*B_d' ;
 R = 0.1*eye(3) ;
 
 P0 = blkdiag(eye(3),0.1*eye(3)) ;
+% P0 = zeros(6,6)' ;
 P(:,:,1) = P0 ;
 xhat0 = x0 ;
 x_hat(:,1)= xhat0 ;
@@ -72,21 +73,42 @@ end
 
 t=0:dT:10-dT;
 
-% part b plot (using first iteration of the Monte Carlo)
-h0b = figure ;
-plot(t,e_norm(1,:),'b',t,P_trace(1,:),'--r',t,-P_trace(1,:),'--r');
-xlabel('Time(sec)');
-ylabel('Errors at each step in time');
-legend('Error','P Trace');
-exportgraphics(h0b,['KF Simulation Results''.jpg'])
-grid on
-
-%part c plot
-h0c = figure ;
+h0 = figure ;
 plot(t,mean(e_norm(:,:)),'b',t,mean(P_trace(:,:)),'--r',t,-mean(P_trace(:,:)),'--r');
 xlabel('Time(sec)');
 ylabel('Average of errors at each step in time');
 legend('Avg error','P Trace');
-exportgraphics(h0c,['Monte Carlo Avereaged Results''.jpg'])
-grid on
+exportgraphics(h0,['Monte Carlo Avereaged Results''.jpg'])
 
+    for k = 2:100
+        urandu = normrnd(u_bar,S_u*eye(3)) ;
+        u_true(:,k-1)=[urandu(1,1);urandu(2,2);urandu(3,3)]; % gaussian random noise with mean S_u
+        x_tru(:,k)=A_d*x_tru(:,k-1) + B_d*u_true(:,k-1); % true state change
+      
+        urandv = normrnd(u_bar,S_v*eye(3)) ;
+        u_sensor(:,k-1)= [urandv(1,1);urandv(2,2);urandv(3,3)] ;
+        y(:,k-1) = C*x_tru(:,k) + sqrtm(S_v)*u_sensor(:,k-1);
+    
+        x_hat(:,k) = A_d*x_hat(:,k-1) ;         % the model assumes ubar=0
+        P(:,:,k) = A_d*P(:,:,k-1)*A_d' + Q;
+    
+        % measurement update
+        K(:,:,k)=P(:,:,k)*C'*inv(C*P(:,:,k)*C' + R);
+        x_hat(:,k)=x_hat(:,k) + K(:,:,k)*(y(:,k-1) - C*x_hat(:,k));
+        P(:,:,k)=(eye(6) - K(:,:,k)*C)*P(:,:,k);
+        
+        % now compute estimate error
+        e(:,k)=x_tru(:,k)-x_hat(:,k);
+        e_norm(rn,k) = norm(e(:,k));
+        P_trace(rn,k)=sqrt(trace(P(:,:,k)));
+    end
+    
+
+t=0:dT:10-dT;
+
+h0 = figure ;
+plot(t,mean(e_norm(:,:)),'b',t,P_trace(:,:),'--r',t,-P_trace(:,:),'--r');
+xlabel('Time(sec)');
+ylabel('Average of errors at each step in time');
+legend('Avg error','P Trace');
+exportgraphics(h0,['Monte Carlo Avereaged Results''.jpg'])
